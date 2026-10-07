@@ -1,0 +1,51 @@
+# AGENTS.md
+
+Guidance for AI coding agents (and humans) working in this repo.
+
+## What this is
+`lamapoll-mailer` (Node.js + TypeScript) sends a confirmation e-mail for every new LamaPoll signup. It polls
+`GET /polls/{id}/legacyResults`, queues submissions in SQLite and sends over SMTP. All configuration (API key, poll,
+e-mail field, SMTP, template, rules) happens in the admin UI; env vars are only HOST, PORT, DATA_DIR.
+The PHP script it replaces lives in `../php` (reference for the CSV shape and the mail template).
+
+## Workflow rules (mandatory)
+1. **TypeScript** for all Node code. Node >= 24 runs `.ts` directly (type stripping): use `.ts` import extensions,
+   `import type`, no enums / parameter properties (`erasableSyntaxOnly`). `npm run typecheck` must be clean.
+2. **Red tests first.** Write the failing test, see it fail for the right reason, then implement.
+3. **Few, meaningful commits** (per module/feature), Conventional Commits (`feat(scope): ...`), with the harness
+   `Co-Authored-By` trailer. Run `npm run typecheck && npm test` before committing.
+4. Never commit secrets or the `data/` directory.
+
+## Commands
+```sh
+npm test | npm run typecheck | npm start
+```
+
+## Layout
+```
+src/server.ts     entry: wiring, loops, graceful shutdown, prints the setup code
+src/app.ts        Express admin app: setup/login, settings wizard, dashboard, template, account
+src/views.ts      server-rendered German HTML (everything through esc())
+src/store.ts      node:sqlite: queue, key/value, sessions (all state lives here)
+src/settings.ts   all settings as one JSON document; readiness checks; secret masking
+src/lamapoll.ts   API client (polls, questions, legacyResults)  | csv.ts hand-written CSV parser
+src/questions.ts  decode answers via question definitions; field pickers (ported from the PHP reference)
+src/poller.ts     fetch -> decode -> queue          | sender.ts  queue -> render -> SMTP, retry/backoff
+src/template.ts   placeholder engine + answers table | mailer.ts nodemailer wrapper | auth.ts scrypt
+test/             node:test; fakes via small interfaces (ResultsSource, Mailer, ApiClient), injectable clocks
+```
+
+## Design invariants (do not break)
+- **One submission = one mail.** Dedup key is `id:<vID>`, never the e-mail address.
+- **All state in SQLite**; restart must be safe. Rows go `pending -> sending -> sent`; `sending` is written BEFORE the
+  SMTP call. Stale `sending` rows are never resent automatically (admin decides).
+- New rows and the watermark are written in ONE transaction. First poll after activation marks existing rows `skipped`
+  unless the admin chose "auch vorhandene mailen".
+- `dateFrom` is date-only by default (the PHP reference did that); overlap is one day, dedup by `vID` makes it harmless.
+- Secrets (API key, SMTP password) are never rendered back into HTML; empty password field = keep the saved one.
+- Template values are HTML-escaped; the subject is forced to one line (no header injection).
+- Run in production with `node` directly (not `npm start`) so SIGTERM reaches the app.
+
+## Gotchas
+- In `openapi.json` (see `../openapi.json`) `legacyResults` query params are declared at PATH level.
+- Exact `dateFrom` semantics and CSV columns still need one check against a real poll (see README).

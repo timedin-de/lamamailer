@@ -1,0 +1,22 @@
+[Unit]
+Description=LamaPoll signup confirmation mailer
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=lamapoll-mailer
+WorkingDirectory=/opt/lamapoll-mailer
+# Run node directly (not "npm start"), so SIGTERM reaches the app and it shuts down cleanly.
+ExecStart=/usr/bin/node --disable-warning=ExperimentalWarning src/server.ts
+Environment=HOST=127.0.0.1 PORT=3000 DATA_DIR=/var/lib/lamapoll-mailer
+StateDirectory=lamapoll-mailer
+Restart=always
+RestartSec=3
+# hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

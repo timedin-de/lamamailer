@@ -1,0 +1,4 @@
+# Automatic HTTPS. Replace the hostname and point its DNS A record to the server.
+mailer.example.org {
+	reverse_proxy 127.0.0.1:3000
+}
