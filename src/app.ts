@@ -223,9 +223,11 @@ export function createApp(deps: AppDeps) {
       const questions = await createApi(s).listQuestions(poll.id);
       const keep = poll.id === s.pollId;
       const guessed = guessFields(fieldChoices(questions, s.lang || 'de'));
+      if (!keep) store.clearPollData(); // a new poll starts from scratch: empty queue, first run again
       settings.update({
         pollId: poll.id, pollTitle: poll.name || `Umfrage ${poll.id}`, questions,
         ...(keep && s.emailVar ? {} : guessed), // switching polls resets the field choice
+        ...(keep ? {} : { enabled: false, sendExisting: false }), // ... and waits for a new "Starten"
       });
     } catch (e) {
       return renderSettings(res, 502, { error: errorMessage(e) });

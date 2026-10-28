@@ -69,9 +69,12 @@ export class Poller {
       rows = await this.#d.createSource(s).legacyResults(s.pollId!, { dateFrom, lang: s.lang || undefined });
     } catch (err) {
       const error = err instanceof Error ? err.message : String(err);
-      store.setKv('last_poll', JSON.stringify({ at: started, ok: false, error }));
+      if (settings.get().pollId === s.pollId) store.setKv('last_poll', JSON.stringify({ at: started, ok: false, error }));
       return { status: 'error', error };
     }
+    // The admin may have switched the poll (or paused) while the request was running: drop the stale result.
+    const current = settings.get();
+    if (current.pollId !== s.pollId || !current.enabled) return { status: 'idle' };
 
     const map = buildQuestionMap(s.questions, s.lang || 'de');
     const items: NewSignup[] = [];

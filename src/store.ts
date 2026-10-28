@@ -202,6 +202,14 @@ export class Store {
     return rows.map(toSignup);
   }
 
+  /** For a poll switch: deletes every signup and the per-poll state, so the new poll starts from scratch. */
+  clearPollData(): void {
+    this.#tx(() => {
+      this.#db.exec('DELETE FROM signups');
+      this.#db.exec("DELETE FROM kv WHERE k IN ('watermark', 'first_run_done', 'last_poll', 'activated')");
+    });
+  }
+
   // ---- login sessions ----
 
   createSession(token: string, expiresAtMs: number): void {

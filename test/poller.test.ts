@@ -144,3 +144,18 @@ test('poll wait doubles per consecutive failure, capped at 5 minutes, never belo
   assert.deepEqual([0, 1, 2, 4, 50].map((f) => pollWaitMs(20_000, f)), [20_000, 40_000, 80_000, 300_000, 300_000]);
   assert.equal(pollWaitMs(600_000, 3), 600_000);
 });
+
+test('a result that arrives after the poll was switched is thrown away', async () => {
+  const t = setup();
+  const source: ResultsSource = {
+    async legacyResults() {
+      t.settings.update({ pollId: 43 }); // admin switches the poll while the request is running
+      t.store.clearPollData();
+      return [row('1', 'a@x.de')];
+    },
+  };
+  const poller = new Poller({ store: t.store, settings: t.settings, createSource: () => source, now: () => t.state.now });
+  assert.equal((await poller.pollOnce()).status, 'idle');
+  assert.deepEqual(t.store.list('', 10), []);
+  assert.deepEqual([t.store.watermark(), t.store.firstRunDone()], [null, false]);
+});

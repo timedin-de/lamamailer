@@ -210,6 +210,29 @@ test('pause and resume', async () => {
   assert.equal(t.settings.get().enabled, true);
 });
 
+test('switching to another poll deletes all queue data and asks again about existing signups', async () => {
+  const t = await startApp();
+  await t.browser.post('/settings/lamapoll/key', { apiKey: 'k' });
+  await t.browser.post('/settings/lamapoll/poll', { pollId: '42' });
+  t.settings.update({ smtpHost: 'h', fromEmail: 'a@b.de' });
+  await t.browser.post('/activate', { sendExisting: '1' });
+  t.store.addSignups([{ key: 'id:1', email: 'a@x.de', name: '', fields: {}, status: 'pending' }], t.clock.now, t.clock.now);
+  t.store.setKv('last_poll', JSON.stringify({ at: t.clock.now, ok: true, added: 1, fetched: 1 }));
+
+  await t.browser.post('/settings/lamapoll/poll', { pollId: '42' }); // same poll again: nothing is lost
+  assert.equal(t.store.list('', 10).length, 1);
+  assert.equal(t.settings.get().enabled, true);
+
+  assert.equal((await t.browser.post('/settings/lamapoll/poll', { pollId: '43' })).status, 303);
+  assert.deepEqual(t.store.list('', 10), []);
+  assert.deepEqual([t.store.watermark(), t.store.firstRunDone(), t.store.getKv('last_poll')], [null, false, null]);
+  const s = t.settings.get();
+  assert.deepEqual([s.pollId, s.pollTitle, s.enabled, s.sendExisting], [43, 'Workshop', false, false]);
+  const dash = await t.browser.get('/');
+  assert.match(dash.html, /Bereit zum Start/); // the "existing signups" question is asked again
+  assert.match(dash.html, /Workshop/);
+});
+
 test('dashboard shows last poll result, counts and queue rows (escaped)', async () => {
   const t = await startApp();
   configure(t);

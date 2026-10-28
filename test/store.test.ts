@@ -155,3 +155,15 @@ test('sessions are valid until they expire and can be deleted', () => {
   store.deleteSession('tok2');
   assert.equal(store.sessionValid('tok2', T0), false);
 });
+
+test('clearPollData removes every signup and the per-poll state, but keeps settings and sessions', () => {
+  const s = new Store(join(tempDir(), 't.db'));
+  s.addSignups([p('id:1', 'a@x.de'), p('id:2', 'b@x.de')], 1000, 1000);
+  for (const k of ['last_poll', 'activated', 'settings', 'admin_hash']) s.setKv(k, '1');
+  s.createSession('tok', 5000);
+  s.clearPollData();
+  assert.deepEqual(s.list('', 10), []);
+  assert.deepEqual(s.counts(), {});
+  assert.deepEqual([s.watermark(), s.firstRunDone(), s.getKv('last_poll'), s.getKv('activated')], [null, false, null, null]);
+  assert.deepEqual([s.getKv('settings'), s.getKv('admin_hash'), s.sessionValid('tok', 1000)], ['1', '1', true]);
+});

@@ -41,6 +41,9 @@ test/             node:test; fakes via small interfaces (ResultsSource, Mailer, 
   SMTP call. Stale `sending` rows are never resent automatically (admin decides).
 - New rows and the watermark are written in ONE transaction. First poll after activation marks existing rows `skipped`
   unless the admin chose "auch vorhandene mailen".
+- **Switching the poll deletes everything poll-related** (`Store.clearPollData`: signups, watermark, first-run flag,
+  last poll, "activated") and disables the mailer, so the "existing signups" question is asked again. `vID`s are only
+  unique per poll. A poll result that arrives after a switch is dropped.
 - `dateFrom` is date-only by default (the PHP reference did that); overlap is one day, dedup by `vID` makes it harmless.
 - Secrets (API key, SMTP password) are never rendered back into HTML; empty password field = keep the saved one.
 - Template values are HTML-escaped; the subject is forced to one line (no header injection).

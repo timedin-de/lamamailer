@@ -141,6 +141,7 @@ export function settingsPage(v: SettingsView): string {
   ${s.apiKey ? `<form method="post" action="/settings/lamapoll/poll">
     <label>Umfrage (Formular)</label>
     ${v.polls ? `<select name="pollId">${opt('', '— bitte wählen —', !s.pollId)}${v.polls.map((p) => opt(String(p.id), `${p.name} (#${p.id})`, p.id === s.pollId)).join('')}</select>` : `<p class="err">Umfragen konnten nicht geladen werden: ${esc(v.pollsError)}</p>`}
+    ${s.pollId ? '<p class="muted">Achtung: Beim Wechsel zu einer anderen Umfrage werden alle bisherigen Einträge gelöscht und der Versand gestoppt.</p>' : ''}
     <p><button>Umfrage übernehmen</button></p>
   </form>` : ''}
   ${s.pollId ? `<form method="post" action="/settings/lamapoll/fields">
