@@ -29,6 +29,16 @@ cd /opt/lamapoll-mailer && sudo npm install --omit=dev
 sudo cp deploy/lamapoll-mailer.service /etc/systemd/system/ && sudo systemctl enable --now lamapoll-mailer
 journalctl -u lamapoll-mailer | grep Setup-Code
 ```
+### Docker (alternative)
+```sh
+docker build -t lamapoll-mailer .
+docker run -d --name lamapoll-mailer --restart unless-stopped \
+  -p 127.0.0.1:3000:3000 -v lamapoll-mailer-data:/data lamapoll-mailer
+docker logs lamapoll-mailer | grep Setup-Code
+```
+Inside the container `HOST=0.0.0.0` and `DATA_DIR=/data`. Publish the port only on `127.0.0.1` and keep the proxy in
+front. The volume holds the secrets, so back it up.
+
 Put Caddy in front for HTTPS (`deploy/Caddyfile`) and allow only ports 22, 80 and 443. Behind a proxy the session cookie
 automatically gets the `Secure` flag (via `X-Forwarded-Proto`). Set SPF, DKIM and DMARC for the sender domain: that matters
 more for deliverability than anything in this code.
