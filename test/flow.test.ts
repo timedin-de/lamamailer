@@ -2,12 +2,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
-import { Store } from '../src/store.ts';
-import { Settings } from '../src/settings.ts';
-import { Poller, type ResultsSource } from '../src/poller.ts';
-import { Sender } from '../src/sender.ts';
-import type { Mailer, OutgoingMail } from '../src/mailer.ts';
-import type { CsvRow, LamaQuestion } from '../src/types.ts';
+import { Store } from '../src/core/store.ts';
+import { Settings } from '../src/core/settings.ts';
+import { Poller, type ResultsSource } from '../src/lamapoll/poller.ts';
+import { Sender } from '../src/mail/sender.ts';
+import type { Mailer, OutgoingMail } from '../src/mail/mailer.ts';
+import type { CsvRow, LamaQuestion } from '../src/core/types.ts';
 import { tempDir } from './helpers.ts';
 
 const T0 = Date.UTC(2026, 9, 9, 18, 0, 0);

@@ -2,12 +2,12 @@
 // The only environment variables: HOST (default 127.0.0.1), PORT (default 3000), DATA_DIR (default ./data).
 import { chmodSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { Store } from './store.ts';
-import { Settings } from './settings.ts';
-import { Poller } from './poller.ts';
-import { Sender } from './sender.ts';
-import { createSmtpMailer } from './mailer.ts';
-import { createApp } from './app.ts';
+import { Store } from './core/store.ts';
+import { Settings } from './core/settings.ts';
+import { Poller } from './lamapoll/poller.ts';
+import { Sender } from './mail/sender.ts';
+import { createSmtpMailer } from './mail/mailer.ts';
+import { createApp } from './web/app.ts';
 
 const host = process.env.HOST ?? '127.0.0.1';
 const port = Number(process.env.PORT ?? 3000);

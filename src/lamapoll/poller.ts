@@ -1,11 +1,11 @@
 // Regularly asks LamaPoll for new completed submissions and puts them in the queue.
-import type { Store, NewSignup } from './store.ts';
-import type { Settings, SettingsData } from './settings.ts';
-import type { ResultsOptions } from './lamapoll.ts';
-import { LamaPollClient } from './lamapoll.ts';
+import type { Store, NewSignup } from '../core/store.ts';
+import type { Settings, SettingsData } from '../core/settings.ts';
+import type { ResultsOptions } from './client.ts';
+import { LamaPollClient } from './client.ts';
 import { buildQuestionMap, decodeAnswer, decodeRow } from './questions.ts';
-import type { CsvRow } from './types.ts';
-import { sleep } from './util.ts';
+import type { CsvRow } from '../core/types.ts';
+import { sleep } from '../core/util.ts';
 
 export interface ResultsSource { legacyResults(pollId: number, opts: ResultsOptions): Promise<CsvRow[]> }
 

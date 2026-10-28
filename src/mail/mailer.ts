@@ -1,6 +1,6 @@
 // SMTP delivery via nodemailer. The Mailer interface lets tests and the sender stay independent of it.
 import nodemailer from 'nodemailer';
-import type { SettingsData } from './settings.ts';
+import type { SettingsData } from '../core/settings.ts';
 
 export interface OutgoingMail { to: string; toName: string; subject: string; html: string; text: string }
 export interface Mailer { send(mail: OutgoingMail): Promise<void> }

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import type { LamaQuestion } from '../src/types.ts';
-import { buildQuestionMap, decodeAnswer, fieldChoices, decodeRow } from '../src/questions.ts';
+import type { LamaQuestion } from '../src/core/types.ts';
+import { buildQuestionMap, decodeAnswer, fieldChoices, decodeRow } from '../src/lamapoll/questions.ts';
 
 // Shaped like GET /polls/{id}/questions (see the PHP reference questions.json).
 const questions: LamaQuestion[] = [

@@ -2,7 +2,7 @@ import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { LamaPollClient, LamaPollError } from '../src/lamapoll.ts';
+import { LamaPollClient, LamaPollError } from '../src/lamapoll/client.ts';
 
 type Handler = (req: IncomingMessage, res: ServerResponse, url: URL) => void;
 const requests: { url: URL; auth: string | undefined }[] = [];

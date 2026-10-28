@@ -1,10 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
-import { Store, type NewSignup } from '../src/store.ts';
-import { Settings } from '../src/settings.ts';
-import { Sender, backoffMs } from '../src/sender.ts';
-import type { Mailer, OutgoingMail } from '../src/mailer.ts';
+import { Store, type NewSignup } from '../src/core/store.ts';
+import { Settings } from '../src/core/settings.ts';
+import { Sender, backoffMs } from '../src/mail/sender.ts';
+import type { Mailer, OutgoingMail } from '../src/mail/mailer.ts';
 import { tempDir } from './helpers.ts';
 
 const T0 = 1_800_000_000_000;

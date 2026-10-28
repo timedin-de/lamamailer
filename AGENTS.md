@@ -23,16 +23,19 @@ npm test | npm run typecheck | npm start
 
 ## Layout
 ```
-src/server.ts     entry: wiring, loops, graceful shutdown, prints the setup code
-src/app.ts        Express admin app: setup/login, settings wizard, dashboard, template, account
-src/views.ts      server-rendered German HTML (everything through esc())
-src/store.ts      node:sqlite: queue, key/value, sessions (all state lives here)
-src/settings.ts   all settings as one JSON document; readiness checks; secret masking
-src/lamapoll.ts   API client (polls, questions, legacyResults)  | csv.ts hand-written CSV parser
-src/questions.ts  decode answers via question definitions; field pickers (ported from the PHP reference)
-src/poller.ts     fetch -> decode -> queue          | sender.ts  queue -> render -> SMTP, retry/backoff
-src/template.ts   placeholder engine + answers table | mailer.ts nodemailer wrapper | auth.ts scrypt
-test/             node:test; fakes via small interfaces (ResultsSource, Mailer, ApiClient), injectable clocks
+src/server.ts              entry: wiring, loops, graceful shutdown, prints the setup code
+src/core/store.ts          node:sqlite: queue, key/value, sessions (all state lives here)
+src/core/settings.ts       all settings as one JSON document; readiness checks; secret masking
+src/core/types.ts, util.ts shared types and helpers
+src/lamapoll/client.ts     API client (polls, questions, legacyResults)  | csv.ts hand-written CSV parser
+src/lamapoll/questions.ts  decode answers via question definitions; field pickers (ported from the PHP reference)
+src/lamapoll/poller.ts     fetch -> decode -> queue
+src/mail/sender.ts         queue -> render -> SMTP, retry/backoff | mailer.ts nodemailer wrapper
+src/mail/template.ts       placeholder engine + answers table
+src/web/app.ts             Express admin app: setup/login, settings wizard, dashboard, template, account
+src/web/views.ts           server-rendered German HTML (everything through esc())
+src/web/auth.ts            scrypt password hashes, tokens
+test/                      node:test; fakes via small interfaces (ResultsSource, Mailer, ApiClient), injectable clocks
 ```
 
 ## Design invariants (do not break)

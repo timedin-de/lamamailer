@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseCsv } from '../src/csv.ts';
+import { parseCsv } from '../src/lamapoll/csv.ts';
 
 test('parses simple semicolon csv', () => {
   assert.deepEqual(parseCsv('a;b\n1;2\n'), [['a', 'b'], ['1', '2']]);

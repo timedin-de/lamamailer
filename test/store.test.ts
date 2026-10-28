@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
-import { Store, type NewSignup } from '../src/store.ts';
+import { Store, type NewSignup } from '../src/core/store.ts';
 import { tempDir } from './helpers.ts';
 
 const T0 = 1_800_000_000_000;

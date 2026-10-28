@@ -1,4 +1,4 @@
-import type { Answer, CsvRow, FieldChoice, Localized, LamaQuestion, QuestionInfo } from './types.ts';
+import type { Answer, CsvRow, FieldChoice, Localized, LamaQuestion, QuestionInfo } from '../core/types.ts';
 
 // Turns LamaPoll question definitions (GET /polls/{id}/questions) into
 //  - a variable map used to decode raw CSV answers into readable text (ported from the PHP reference),

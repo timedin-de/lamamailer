@@ -1,11 +1,11 @@
 import { after } from 'node:test';
 import { join } from 'node:path';
 import type { AddressInfo } from 'node:net';
-import { Store } from '../src/store.ts';
-import { Settings } from '../src/settings.ts';
-import { createApp, type ApiClient } from '../src/app.ts';
-import type { Mailer, OutgoingMail, SmtpMailer } from '../src/mailer.ts';
-import type { LamaPoll, LamaQuestion } from '../src/types.ts';
+import { Store } from '../src/core/store.ts';
+import { Settings } from '../src/core/settings.ts';
+import { createApp, type ApiClient } from '../src/web/app.ts';
+import type { Mailer, OutgoingMail, SmtpMailer } from '../src/mail/mailer.ts';
+import type { LamaPoll, LamaQuestion } from '../src/core/types.ts';
 import { tempDir } from './helpers.ts';
 
 export const SETUP_TOKEN = 'setup-token-123';

@@ -1,6 +1,6 @@
 // Small client for the LamaPoll API v2: poll list, question list and the legacyResults CSV export.
 import { parseCsv } from "./csv.ts";
-import type { CsvRow, LamaPoll, LamaQuestion } from "./types.ts";
+import type { CsvRow, LamaPoll, LamaQuestion } from "../core/types.ts";
 
 export class LamaPollError extends Error {
   status?: number;

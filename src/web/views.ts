@@ -1,7 +1,7 @@
 // Server-rendered HTML pages (German UI). Every dynamic value goes through esc().
-import type { SettingsData } from "./settings.ts";
-import type { Signup } from "./store.ts";
-import type { FieldChoice, LamaPoll } from "./types.ts";
+import type { SettingsData } from "../core/settings.ts";
+import type { Signup } from "../core/store.ts";
+import type { FieldChoice, LamaPoll } from "../core/types.ts";
 
 export const esc = (v: unknown): string =>
   String(v ?? "")

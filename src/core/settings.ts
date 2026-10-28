@@ -1,7 +1,7 @@
 // Every setting is edited in the admin UI and stored as one JSON document in the database.
 import type { Store } from './store.ts';
 import type { LamaQuestion } from './types.ts';
-import { DEFAULT_BODY, DEFAULT_SUBJECT } from './template.ts';
+import { DEFAULT_BODY, DEFAULT_SUBJECT } from '../mail/template.ts';
 
 export interface SettingsData {
   // LamaPoll

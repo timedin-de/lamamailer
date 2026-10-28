@@ -2,7 +2,7 @@
 //   {name} {first_name} {last_name} {email} {site_url} {field:V60} {answers}
 // Values are HTML-escaped in the body. {answers} renders a question/answer table of the whole signup.
 // Unknown {words} are left as they are and reported, so typos are visible in the preview.
-import type { Answer } from './types.ts';
+import type { Answer } from '../core/types.ts';
 
 export interface MailContext {
   name: string;

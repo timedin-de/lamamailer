@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
-import { Store } from '../src/store.ts';
-import { Settings, DEFAULTS, maskSecrets } from '../src/settings.ts';
+import { Store } from '../src/core/store.ts';
+import { Settings, DEFAULTS, maskSecrets } from '../src/core/settings.ts';
 import { tempDir } from './helpers.ts';
 
 function open() {

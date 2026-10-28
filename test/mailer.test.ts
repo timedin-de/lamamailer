@@ -2,8 +2,8 @@ import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:net';
 import type { AddressInfo } from 'node:net';
-import { createSmtpMailer } from '../src/mailer.ts';
-import { DEFAULTS } from '../src/settings.ts';
+import { createSmtpMailer } from '../src/mail/mailer.ts';
+import { DEFAULTS } from '../src/core/settings.ts';
 
 // Minimal plain-text SMTP server: accepts one mail and records the DATA part.
 const received: string[] = [];

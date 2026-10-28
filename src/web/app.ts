@@ -5,16 +5,16 @@ import express, {
   type Response,
 } from "express";
 import { hashPassword, newToken, safeEqual, verifyPassword } from "./auth.ts";
-import { LamaPollClient } from "./lamapoll.ts";
-import { createSmtpMailer, type SmtpMailer } from "./mailer.ts";
-import { fieldChoices } from "./questions.ts";
-import type { Settings, SettingsData } from "./settings.ts";
-import { maskSecrets } from "./settings.ts";
-import type { Store } from "./store.ts";
-import { STALE_SENDING_MS } from "./store.ts";
-import { renderMail, SAMPLE_CONTEXT } from "./template.ts";
-import type { FieldChoice, LamaPoll, LamaQuestion } from "./types.ts";
-import { sleep } from "./util.ts";
+import type { Settings, SettingsData } from "../core/settings.ts";
+import { maskSecrets } from "../core/settings.ts";
+import type { Store } from "../core/store.ts";
+import { STALE_SENDING_MS } from "../core/store.ts";
+import type { FieldChoice, LamaPoll, LamaQuestion } from "../core/types.ts";
+import { sleep } from "../core/util.ts";
+import { LamaPollClient } from "../lamapoll/client.ts";
+import { fieldChoices } from "../lamapoll/questions.ts";
+import { createSmtpMailer, type SmtpMailer } from "../mail/mailer.ts";
+import { renderMail, SAMPLE_CONTEXT } from "../mail/template.ts";
 import * as v from "./views.ts";
 
 export interface ApiClient {

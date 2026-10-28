@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { renderMail, SAMPLE_CONTEXT, DEFAULT_SUBJECT, DEFAULT_BODY, type MailContext } from '../src/template.ts';
+import { renderMail, SAMPLE_CONTEXT, DEFAULT_SUBJECT, DEFAULT_BODY, type MailContext } from '../src/mail/template.ts';
 
 const ctx: MailContext = {
   name: 'Anna Müller', firstName: 'Anna', lastName: 'Müller', email: 'anna@example.org', siteUrl: 'https://example.org',

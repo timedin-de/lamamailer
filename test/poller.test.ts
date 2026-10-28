@@ -1,11 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
-import { Store } from '../src/store.ts';
-import { Settings } from '../src/settings.ts';
-import { Poller, pollWaitMs, type ResultsSource } from '../src/poller.ts';
-import type { CsvRow, LamaQuestion } from '../src/types.ts';
-import type { ResultsOptions } from '../src/lamapoll.ts';
+import { Store } from '../src/core/store.ts';
+import { Settings } from '../src/core/settings.ts';
+import { Poller, pollWaitMs, type ResultsSource } from '../src/lamapoll/poller.ts';
+import type { CsvRow, LamaQuestion } from '../src/core/types.ts';
+import type { ResultsOptions } from '../src/lamapoll/client.ts';
 import { tempDir } from './helpers.ts';
 
 const T0 = Date.UTC(2026, 9, 7, 12, 0, 0); // 2026-10-07 12:00 UTC

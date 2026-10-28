@@ -1,9 +1,9 @@
 // Works through the queue: claim a row, render the mail, send it, record the outcome.
-import type { Store, Signup } from './store.ts';
-import type { Settings } from './settings.ts';
+import type { Store, Signup } from '../core/store.ts';
+import type { Settings } from '../core/settings.ts';
 import type { Mailer } from './mailer.ts';
 import { renderMail, type MailContext } from './template.ts';
-import { sleep } from './util.ts';
+import { sleep } from '../core/util.ts';
 
 export interface SenderDeps {
   store: Store;
