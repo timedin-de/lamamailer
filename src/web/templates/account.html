@@ -1,0 +1,10 @@
+<h1>Konto</h1>
+{{> messages}}
+<form method="post" action="/account/password" class="card">
+  <h2>Passwort ändern</h2>
+  <label>Aktuelles Passwort<input type="password" name="current" autocomplete="current-password" required></label>
+  <label>Neues Passwort (mindestens 8 Zeichen)<input type="password" name="next" autocomplete="new-password" required></label>
+  <label>Neues Passwort wiederholen<input type="password" name="next2" autocomplete="new-password" required></label>
+  <p><button>Ändern</button></p>
+  <p class="muted">Andere angemeldete Geräte werden abgemeldet.</p>
+</form>

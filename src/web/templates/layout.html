@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}} · Anmelde-Mailer</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+{{#if nav}}
+<nav>
+  <strong>Anmelde-Mailer</strong>
+  <a href="/"{{#if nav.dashboard}} class="cur"{{/if}}>Übersicht</a>
+  <a href="/settings"{{#if nav.settings}} class="cur"{{/if}}>Einstellungen</a>
+  <a href="/template"{{#if nav.template}} class="cur"{{/if}}>Mail-Text</a>
+  <a href="/account"{{#if nav.account}} class="cur"{{/if}}>Konto</a>
+  <form method="post" action="/logout"><button class="secondary small">Abmelden</button></form>
+</nav>
+{{/if}}
+{{{body}}}
+</body>
+</html>

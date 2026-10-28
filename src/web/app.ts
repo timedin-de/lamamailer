@@ -4,6 +4,7 @@ import express, {
   type Request,
   type Response,
 } from "express";
+import { fileURLToPath } from "node:url";
 import { hashPassword, newToken, safeEqual, verifyPassword } from "./auth.ts";
 import type { Settings, SettingsData } from "../core/settings.ts";
 import { maskSecrets } from "../core/settings.ts";
@@ -64,6 +65,15 @@ export function createApp(deps: AppDeps) {
   app.disable("x-powered-by");
   app.set("trust proxy", "loopback"); // behind Caddy: req.secure follows X-Forwarded-Proto
   app.use(express.urlencoded({ extended: false, limit: "2mb" }));
+
+  // Stylesheet: public, so it is served before the setup and login checks.
+  app.use(
+    "/static",
+    express.static(fileURLToPath(new URL("./static/", import.meta.url)), {
+      index: false,
+    }),
+    (_req: Request, res: Response) => void res.status(404).send("Not found"),
+  );
 
   const html = (res: Response, status: number, body: string) =>
     res.status(status).type("html").send(body);

@@ -1,0 +1,21 @@
+<h1>Mail-Text</h1>
+{{> messages}}
+<form method="post" action="/template" class="card">
+  <p class="muted">Platzhalter: <code>{name}</code> <code>{first_name}</code> <code>{last_name}</code> <code>{email}</code> <code>{site_url}</code>
+  <code>{answers}</code> (Tabelle aller Antworten) <code>{field:V60}</code> (einzelne Antwort nach Variablenname). Der Text darf HTML enthalten.</p>
+  <label>Betreff<input type="text" name="subject" value="{{subject}}" required></label>
+  <label>Text (HTML)<textarea name="body">{{body}}</textarea></label>
+  <p><button>Speichern</button> <button class="secondary" formaction="/template/preview">Vorschau</button></p>
+  <label>Test-Mail an <input type="email" name="to" placeholder="ich@example.org"></label>
+  <p><button class="secondary" formaction="/template/test">Test-Mail senden</button></p>
+</form>
+
+{{#with preview}}
+<div class="card">
+  <h2>Vorschau</h2>
+  {{#if unknown.length}}<p class="warn">Unbekannte Platzhalter: {{#each unknown}}{{#unless @first}}, {{/unless}}{{this}}{{/each}}</p>{{/if}}
+  <p><strong>Betreff:</strong> {{subject}}</p>
+  <iframe sandbox="" srcdoc="{{html}}" title="Vorschau"></iframe>
+  <details><summary>Text-Version</summary><pre>{{text}}</pre></details>
+</div>
+{{/with}}

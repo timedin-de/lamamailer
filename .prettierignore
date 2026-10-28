@@ -1,0 +1,5 @@
+# Handlebars templates: prettier's HTML parser treats {{#if}}/{{#each}} as text and mangles them.
+src/web/templates/
+src/mail/default-body.html
+data/
+coverage/

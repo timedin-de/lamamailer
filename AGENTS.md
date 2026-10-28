@@ -31,9 +31,10 @@ src/lamapoll/client.ts     API client (polls, questions, legacyResults)  | csv.t
 src/lamapoll/questions.ts  decode answers via question definitions; field pickers (ported from the PHP reference)
 src/lamapoll/poller.ts     fetch -> decode -> queue
 src/mail/sender.ts         queue -> render -> SMTP, retry/backoff | mailer.ts nodemailer wrapper
-src/mail/template.ts       placeholder engine + answers table
+src/mail/template.ts       placeholder engine + answers table | default-body.html default mail text
 src/web/app.ts             Express admin app: setup/login, settings wizard, dashboard, template, account
-src/web/views.ts           server-rendered German HTML (everything through esc())
+src/web/views.ts           prepares page data and renders src/web/templates/*.html (Handlebars, German UI)
+src/web/templates/         layout.html, one file per page, partials/ | static/style.css served at /static
 src/web/auth.ts            scrypt password hashes, tokens
 test/                      node:test; fakes via small interfaces (ResultsSource, Mailer, ApiClient), injectable clocks
 ```
@@ -50,6 +51,8 @@ test/                      node:test; fakes via small interfaces (ResultsSource,
 - `dateFrom` is date-only by default (the PHP reference did that); overlap is one day, dedup by `vID` makes it harmless.
 - Secrets (API key, SMTP password) are never rendered back into HTML; empty password field = keep the saved one.
 - Template values are HTML-escaped; the subject is forced to one line (no header injection).
+- Admin UI templates output values with `{{x}}` (escaped). Triple braces `{{{x}}}` only for the page body in
+  `layout.html`; never for user or API data.
 - Run in production with `node` directly (not `npm start`) so SIGTERM reaches the app.
 
 ## Gotchas

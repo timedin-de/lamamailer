@@ -2,6 +2,7 @@
 //   {name} {first_name} {last_name} {email} {site_url} {field:V60} {answers}
 // Values are HTML-escaped in the body. {answers} renders a question/answer table of the whole signup.
 // Unknown {words} are left as they are and reported, so typos are visible in the preview.
+import { readFileSync } from 'node:fs';
 import type { Answer } from '../core/types.ts';
 
 export interface MailContext {
@@ -18,13 +19,8 @@ export interface RenderedMail { subject: string; html: string; text: string; unk
 
 export const DEFAULT_SUBJECT = 'Deine Anmeldung ist eingegangen';
 
-export const DEFAULT_BODY = `<div style="max-width:560px;margin:24px auto;padding:20px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#222;">
-  <h1 style="font-size:22px;">Anmeldung erfolgreich</h1>
-  <p>Hallo {name},</p>
-  <p>vielen Dank, deine Anmeldung ist bei uns angekommen!</p>
-  {answers}
-  <p style="margin-top:24px;">Viele Grüße<br>Das Event-Team</p>
-</div>`;
+// Starting point for the editor in the admin UI; the saved text lives in the settings.
+export const DEFAULT_BODY = readFileSync(new URL('./default-body.html', import.meta.url), 'utf8').trimEnd();
 
 export const SAMPLE_CONTEXT: MailContext = {
   name: 'Max Mustermann', firstName: 'Max', lastName: 'Mustermann', email: 'max@example.org', siteUrl: 'https://example.org',

@@ -1,0 +1,57 @@
+<h1>Übersicht</h1>
+{{> messages}}
+
+{{#if is.unconfigured}}
+<p class="warn"><strong>Noch nicht eingerichtet.</strong> Es fehlt: {{#each missing}}{{#unless @first}}, {{/unless}}{{this}}{{/each}}. <a href="/settings">Zu den Einstellungen</a></p>
+{{/if}}
+{{#if is.ready}}
+<form method="post" action="/activate" class="card">
+  <h2>Bereit zum Start</h2>
+  <p>Umfrage: <strong>{{pollTitle}}</strong>. Was soll mit Anmeldungen passieren, die jetzt schon vorhanden sind?</p>
+  <label><input type="radio" name="sendExisting" value="0" checked> Vorhandene Anmeldungen nicht mailen (empfohlen)</label>
+  <label><input type="radio" name="sendExisting" value="1"> Auch vorhandene Anmeldungen anmailen</label>
+  <p><button>Starten</button></p>
+</form>
+{{/if}}
+{{#if is.active}}
+<div class="card">
+  <h2>Aktiv</h2>
+  <p>Umfrage: <strong>{{pollTitle}}</strong>. Neue Anmeldungen werden automatisch bestätigt.</p>
+  <form method="post" action="/pause"><button class="secondary">Versand pausieren</button></form>
+</div>
+{{/if}}
+{{#if is.paused}}
+<div class="card warn">
+  <h2>Pausiert</h2>
+  <p>Es wird nichts abgefragt oder gesendet. Anmeldungen aus der Pause werden nach dem Fortsetzen nachgeholt.</p>
+  <form method="post" action="/resume"><button>Fortsetzen</button></form>
+</div>
+{{/if}}
+
+{{#with lastPoll}}
+<p class="muted">Letzte Abfrage: {{at}} – {{#if ok}}ok ({{fetched}} Einträge, {{added}} neu){{else}}<span class="err">Fehler: {{error}}</span>{{/if}}</p>
+{{else}}
+<p class="muted">Noch keine Abfrage.</p>
+{{/with}}
+
+{{#if staleCount}}
+<p class="warn"><strong>{{staleCount}} Eintrag/Einträge hängen im Status „sending“.</strong> Der Server wurde vermutlich mitten im Versand beendet. Schauen Sie im SMTP-Log/Postfach nach, ob die Mail raus ging: „Bestätigen“ = wurde gesendet, „Erneut“ = nochmal senden.</p>
+{{/if}}
+
+<p>{{#each counts}}{{#unless @first}} &nbsp; {{/unless}}<a href="/?status={{status}}">{{status}}: {{n}}</a>{{else}}Noch keine Anmeldungen.{{/each}}{{#if filter}} &nbsp; <a href="/">alle anzeigen</a>{{/if}}</p>
+
+<table>
+  <tr><th>#</th><th>Zeit</th><th>E-Mail</th><th>Name</th><th>Status</th><th>Versuche</th><th>Fehler</th><th></th></tr>
+  {{#each rows}}
+  <tr>
+    <td>{{id}}</td><td>{{createdAt}}</td><td>{{email}}</td><td>{{name}}</td>
+    <td>{{status}}{{#if stale}} <strong class="err">Prüfen</strong>{{/if}}</td><td>{{attempts}}</td><td class="err">{{error}}</td>
+    <td>
+      {{#if stale}}<form class="inline" method="post" action="/confirm/{{id}}"><button class="small secondary">Bestätigen</button></form>{{/if}}
+      {{#if canRetry}}<form class="inline" method="post" action="/retry/{{id}}"><button class="small secondary">Erneut</button></form>{{/if}}
+    </td>
+  </tr>
+  {{else}}
+  <tr><td colspan="8">Keine Einträge.</td></tr>
+  {{/each}}
+</table>

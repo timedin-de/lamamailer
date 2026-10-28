@@ -1,0 +1,82 @@
+<h1>Einstellungen</h1>
+{{> messages}}
+
+<div class="card">
+  <h2>1 · LamaPoll verbinden</h2>
+  <form method="post" action="/settings/lamapoll/key">
+    <label>API-Schlüssel{{#if s.apiKey}} <span class="muted">(gespeichert: {{s.apiKey}})</span>{{/if}}
+      <input type="password" name="apiKey" autocomplete="off" placeholder="{{#if s.apiKey}}Neuen Schlüssel eingeben zum Ersetzen{{else}}Schlüssel aus Ihrem LamaPoll-Profil (API){{/if}}" required></label>
+    <p><button>{{#if s.apiKey}}Ersetzen{{else}}Verbinden{{/if}}</button></p>
+  </form>
+
+  {{#if s.apiKey}}
+  <form method="post" action="/settings/lamapoll/poll">
+    <label>Umfrage (Formular)</label>
+    {{#if pollOptions}}
+    <select name="pollId">{{> options pollOptions}}</select>
+    {{else}}
+    <p class="err">Umfragen konnten nicht geladen werden: {{pollsError}}</p>
+    {{/if}}
+    {{#if s.pollId}}<p class="muted">Achtung: Beim Wechsel zu einer anderen Umfrage werden alle bisherigen Einträge gelöscht und der Versand gestoppt.</p>{{/if}}
+    <p><button>Umfrage übernehmen</button></p>
+  </form>
+  {{/if}}
+
+  {{#if s.pollId}}
+  <form method="post" action="/settings/lamapoll/fields">
+    <div class="row">
+      <div><label>E-Mail-Feld (Pflicht)</label><select name="emailVar">{{> options emailOptions}}</select></div>
+      <div><label>Vorname-Feld (optional)</label><select name="firstNameVar">{{> options firstNameOptions}}</select></div>
+      <div><label>Nachname-Feld (optional)</label><select name="lastNameVar">{{> options lastNameOptions}}</select></div>
+    </div>
+    <p class="muted">Zur Auswahl stehen die Textfelder der Umfrage ({{choiceCount}}). Der Name wird für die Anrede genutzt.</p>
+    <p><button>Felder speichern</button></p>
+  </form>
+  <form method="post" action="/settings/lamapoll/refresh"><button class="secondary small">Fragen neu laden</button> <span class="muted">falls das Formular geändert wurde</span></form>
+  {{/if}}
+
+  <details><summary>Erweitert</summary>
+    <form method="post" action="/settings/advanced">
+      <div class="row">
+        <div><label>API-Adresse</label><input type="url" name="baseUrl" value="{{s.baseUrl}}" required></div>
+        <div><label>Sprache der Fragetexte</label><input type="text" name="lang" value="{{s.lang}}" maxlength="2" pattern="[a-z]{2}"></div>
+        <div><label>Datumsformat für „dateFrom“</label><select name="dateFromFormat">{{> options dateFromOptions}}</select></div>
+        <div><label>Abfrage-Intervall (Sekunden)</label><input type="number" name="pollIntervalSec" min="5" max="3600" value="{{s.pollIntervalSec}}"></div>
+      </div>
+      <p><button class="secondary">Speichern</button></p>
+    </form>
+  </details>
+</div>
+
+<div class="card">
+  <h2>2 · E-Mail-Versand (SMTP)</h2>
+  <form method="post" action="/settings/smtp">
+    <div class="row">
+      <div><label>SMTP-Server</label><input type="text" name="smtpHost" value="{{s.smtpHost}}" required></div>
+      <div><label>Port</label><input type="number" name="smtpPort" value="{{s.smtpPort}}" min="1" max="65535" required></div>
+      <div><label>Verschlüsselung</label><select name="smtpSecurity">{{> options securityOptions}}</select></div>
+      <div><label>Benutzer</label><input type="text" name="smtpUser" value="{{s.smtpUser}}" autocomplete="off"></div>
+      <div><label>Passwort {{#if s.smtpPassword}}<span class="muted">(gespeichert; leer lassen = behalten)</span>{{/if}}</label><input type="password" name="smtpPassword" autocomplete="new-password"></div>
+    </div>
+    <div class="row">
+      <div><label>Absender-Adresse</label><input type="email" name="fromEmail" value="{{s.fromEmail}}" required></div>
+      <div><label>Absender-Name</label><input type="text" name="fromName" value="{{s.fromName}}"></div>
+      <div><label>Antwort an (optional)</label><input type="email" name="replyTo" value="{{s.replyTo}}"></div>
+    </div>
+    <p><button>Speichern</button></p>
+  </form>
+  <form method="post" action="/settings/smtp/verify"><button class="secondary">Verbindung testen</button></form>
+</div>
+
+<div class="card">
+  <h2>3 · Versand-Regeln</h2>
+  <form method="post" action="/settings/sending">
+    <div class="row">
+      <div><label>Mails pro Sekunde (max.)</label><input type="number" name="ratePerSec" step="0.1" min="0.1" max="50" value="{{s.ratePerSec}}"></div>
+      <div><label>Versuche pro Mail</label><input type="number" name="maxAttempts" min="1" max="20" value="{{s.maxAttempts}}"></div>
+      <div><label>Max. Mails pro Adresse und Stunde (0 = unbegrenzt)</label><input type="number" name="perAddressCap" min="0" max="1000" value="{{s.perAddressCap}}"></div>
+      <div><label>Website-URL (Platzhalter <code>{site_url}</code>)</label><input type="url" name="siteUrl" value="{{s.siteUrl}}"></div>
+    </div>
+    <p><button>Speichern</button></p>
+  </form>
+</div>

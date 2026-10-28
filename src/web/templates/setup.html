@@ -1,0 +1,9 @@
+<h1>Erster Start: Admin-Passwort festlegen</h1>
+{{> messages}}
+<form method="post" action="/setup" class="card">
+  <p class="muted">Den Setup-Code finden Sie im Server-Log (Zeile „Setup-Code“). Er schützt davor, dass jemand anderes das Passwort zuerst setzt.</p>
+  <label>Setup-Code<input type="text" name="token" autocomplete="off" required></label>
+  <label>Passwort (mindestens 8 Zeichen)<input type="password" name="password" autocomplete="new-password" required></label>
+  <label>Passwort wiederholen<input type="password" name="password2" autocomplete="new-password" required></label>
+  <p><button>Festlegen</button></p>
+</form>

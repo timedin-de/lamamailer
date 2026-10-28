@@ -44,6 +44,18 @@ test('protected pages redirect to the login; wrong password is refused; right on
   assert.equal((await anon.get('/')).status, 200);
 });
 
+test('the stylesheet is a separate file, reachable before setup and without a session', async () => {
+  const t = await startApp({ setup: false });
+  const css = await t.browser.get('/static/style.css');
+  assert.equal(css.status, 200);
+  assert.match(css.res.headers.get('content-type') ?? '', /text\/css/);
+  assert.match(css.html, /\.card\s*\{/);
+  const page = await t.browser.get('/setup');
+  assert.match(page.html, /<link rel="stylesheet" href="\/static\/style\.css">/);
+  assert.doesNotMatch(page.html, /<style>/);
+  assert.equal((await t.browser.get('/static/nope.css')).status, 404);
+});
+
 test('logout and expiry end the session', async () => {
   const t = await startApp();
   await t.browser.post('/logout');
