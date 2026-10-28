@@ -66,7 +66,7 @@ export class LamaPollClient {
 
   async listPolls(): Promise<LamaPoll[]> {
     const polls = await this.#list<LamaPoll>('/polls');
-    return polls.map((p) => ({ ...p, title: p.title || p.name || `Umfrage ${p.id}` }));
+    return polls.map((p) => ({ ...p, name: p.name || `Umfrage ${p.id}` }));
   }
 
   listQuestions(pollId: number): Promise<LamaQuestion[]> {
@@ -83,10 +83,11 @@ export class LamaPollClient {
     if (opts.dateFrom) params.dateFrom = opts.dateFrom;
     if (opts.lang) params.lang = opts.lang;
 
-    const body = (await this.#get(`/polls/${pollId}/legacyResults`, params)) as { success?: boolean; code?: number; data?: string };
-    if (!body.success) throw new LamaPollError(`LamaPoll meldet einen Fehler (Code ${body.code ?? '?'})`);
+    // The response is { numCols, numLines, data } - there is no success flag.
+    const body = (await this.#get(`/polls/${pollId}/legacyResults`, params)) as { data?: unknown };
+    if (typeof body?.data !== 'string') throw new LamaPollError('Unerwartete Antwort von LamaPoll (keine CSV-Daten)');
 
-    const [header, ...records] = parseCsv(body.data ?? '', ';');
+    const [header, ...records] = parseCsv(body.data, ';');
     if (!header) return [];
     const names = header.map((h) => h.trim());
     return records.map((cells) => {

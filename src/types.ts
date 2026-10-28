@@ -19,11 +19,10 @@ export interface LamaQuestion {
   groups?: LamaGroup[];
 }
 
-/** One poll as returned by GET /polls. */
+/** One poll as returned by GET /polls. Only the name is used (the API's "title" is the public title). */
 export interface LamaPoll {
   id: number;
   name?: string;
-  title?: string;
   url?: string;
 }
 

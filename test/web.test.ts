@@ -84,6 +84,7 @@ test('settings: key -> poll list -> poll choice loads questions and preselects t
   assert.match(page.html, /••••9876/);
   assert.match(page.html, /Sommertreffen 2026/);
   assert.match(page.html, /Workshop/);
+  assert.doesNotMatch(page.html, /Öffentlicher Titel/); // the poll's name is shown, never its title
 
   await t.browser.post('/settings/lamapoll/poll', { pollId: '42' });
   const s = t.settings.get();

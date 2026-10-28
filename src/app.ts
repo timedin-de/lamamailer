@@ -224,7 +224,7 @@ export function createApp(deps: AppDeps) {
       const keep = poll.id === s.pollId;
       const guessed = guessFields(fieldChoices(questions, s.lang || 'de'));
       settings.update({
-        pollId: poll.id, pollTitle: poll.title ?? `Umfrage ${poll.id}`, questions,
+        pollId: poll.id, pollTitle: poll.name || `Umfrage ${poll.id}`, questions,
         ...(keep && s.emailVar ? {} : guessed), // switching polls resets the field choice
       });
     } catch (e) {

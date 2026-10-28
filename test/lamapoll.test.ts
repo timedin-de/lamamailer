@@ -26,13 +26,13 @@ const client = (extra = {}) => new LamaPollClient({ baseUrl: base, apiKey: 'KEY'
 
 test('listPolls sends the bearer key and follows pagination', async () => {
   requests.length = 0;
-  const all = [{ id: 1, title: 'A' }, { id: 2, name: 'B-name' }, { id: 3, title: 'C', url: 'https://x/c' }];
+  const all = [{ id: 1, name: 'A', title: 'A-title' }, { id: 2, name: 'B' }, { id: 3, title: 'C-title', url: 'https://x/c' }];
   handler = (_req, res, url) => {
     const off = Number(url.searchParams.get('offset')), lim = Number(url.searchParams.get('limit'));
     json(res, all.slice(off, off + lim));
   };
   const polls = await client().listPolls();
-  assert.deepEqual(polls.map((p) => [p.id, p.title]), [[1, 'A'], [2, 'B-name'], [3, 'C']]); // title falls back to name
+  assert.deepEqual(polls.map((p) => [p.id, p.name]), [[1, 'A'], [2, 'B'], [3, 'Umfrage 3']]); // name only, never the title
   assert.ok(requests.every((r) => r.auth === 'Bearer KEY'));
   assert.equal(requests.length, 2); // 2 + 1 items -> second page is short, stop
 });
@@ -57,7 +57,7 @@ test('a rejected key becomes a clear LamaPollError', async () => {
 test('legacyResults requests the export like the PHP reference and returns rows keyed by variable', async () => {
   requests.length = 0;
   const csv = 'vID;vCOMPLETED;V2;V76\n101;1;Anna;anna@example.org\n102;1;"Ben ""B""";ben@example.org\n';
-  handler = (_req, res) => json(res, { success: true, code: 200, data: csv });
+  handler = (_req, res) => json(res, { numCols: 4, numLines: 3, data: csv });
   const rows = await client().legacyResults(42, { dateFrom: '2026-10-06', lang: 'de' });
   const q = requests[0].url.searchParams;
   assert.equal(requests[0].url.pathname, '/api/v2/polls/42/legacyResults');
@@ -73,14 +73,16 @@ test('legacyResults requests the export like the PHP reference and returns rows 
 
 test('legacyResults omits dateFrom/lang when not given and handles empty data', async () => {
   requests.length = 0;
-  handler = (_req, res) => json(res, { success: true, data: '' });
+  handler = (_req, res) => json(res, { numCols: 0, numLines: 0, data: '' });
   assert.deepEqual(await client().legacyResults(1, {}), []);
   assert.equal(requests[0].url.searchParams.has('dateFrom'), false);
   assert.equal(requests[0].url.searchParams.has('lang'), false);
 });
 
-test('legacyResults surfaces success=false and HTTP errors', async () => {
-  handler = (_req, res) => json(res, { success: false, code: 5 });
+test('legacyResults surfaces a response without CSV data and HTTP errors', async () => {
+  handler = (_req, res) => json(res, { numCols: 0, numLines: 0 });
+  await assert.rejects(() => client().legacyResults(1, {}), (e: unknown) => e instanceof LamaPollError && /keine CSV-Daten/.test(e.message));
+  handler = (_req, res) => json(res, { data: 42 });
   await assert.rejects(() => client().legacyResults(1, {}), LamaPollError);
   handler = (_req, res) => json(res, { message: 'boom' }, 500);
   await assert.rejects(() => client().legacyResults(1, {}), (e: unknown) => e instanceof LamaPollError && e.status === 500);

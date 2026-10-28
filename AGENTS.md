@@ -48,4 +48,7 @@ test/             node:test; fakes via small interfaces (ResultsSource, Mailer, 
 
 ## Gotchas
 - In `openapi.json` (see `../openapi.json`) `legacyResults` query params are declared at PATH level.
+- The real `legacyResults` response is `{ numCols, numLines, data }` - there is NO `success` flag (the spec example
+  even has a typo "sucess"). Only check that `data` is a string.
+- Polls: always use `name`, never `title` (the public title). `LamaPoll` has no `title` field on purpose.
 - Exact `dateFrom` semantics and CSV columns still need one check against a real poll (see README).

@@ -11,7 +11,8 @@ import { tempDir } from './helpers.ts';
 export const SETUP_TOKEN = 'setup-token-123';
 export const PASSWORD = 'correct horse battery';
 
-export const POLLS: LamaPoll[] = [{ id: 42, title: 'Sommertreffen 2026' }, { id: 43, title: 'Workshop' }];
+// The API also sends a "title"; the app must show the name.
+export const POLLS = [{ id: 42, name: 'Sommertreffen 2026', title: 'Öffentlicher Titel' }, { id: 43, name: 'Workshop' }] as LamaPoll[];
 export const QUESTIONS: LamaQuestion[] = [
   { id: 1, type: 'INPUT', question: { de: 'Vorname' }, groups: [{ inputType: 'SINGLELINE', varnames: ['V2'] }] },
   { id: 2, type: 'INPUT', question: { de: 'Nachname' }, groups: [{ inputType: 'SINGLELINE', varnames: ['V3'] }] },
