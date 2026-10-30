@@ -13,7 +13,9 @@ class FakeMailer implements Mailer {
   sent: OutgoingMail[] = [];
   failures: (Error | null)[] = [];
   calls = 0;
+  onSend = () => {}; // e.g. advance the fake clock to simulate a slow SMTP server
   async send(mail: OutgoingMail): Promise<void> {
+    this.onSend();
     const failure = this.failures[this.calls++];
     if (failure) throw failure;
     this.sent.push(mail);
@@ -155,6 +157,19 @@ test("a failure pauses the whole queue so a rate limit can recover", async () =>
   await t.sender.sendNext();
   await t.sender.sendNext();
   assert.equal(t.mailer.sent.length, 3);
+});
+
+test("the pause and the retry start when a slow send fails, not when it started", async () => {
+  const t = setup();
+  t.mailer.failures = [new Error("timeout")];
+  t.mailer.onSend = () => (t.clock.now += 45_000); // longer than the first pause
+  t.add("id:1", "a@x.de");
+  t.add("id:2", "b@x.de");
+  await t.sender.sendNext();
+  assert.equal(t.status("id:1").nextTryAt, T0 + 45_000 + 30_000);
+  t.mailer.onSend = () => {};
+  assert.equal(await t.sender.sendNext(), false); // still paused right after the failure
+  assert.equal(t.mailer.calls, 1);
 });
 
 test("per-address cap skips excess mails to one address only", async () => {

@@ -87,10 +87,11 @@ export class Sender {
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
+      const failedAt = this.#d.now(); // a send can take longer than the first backoff
       if (row.attempts >= s.maxAttempts)
         store.markFinal(row.id, "failed", message);
-      else store.markRetry(row.id, now + backoffMs(row.attempts), message);
-      this.#pausedUntil = now + backoffMs(++this.#failStreak);
+      else store.markRetry(row.id, failedAt + backoffMs(row.attempts), message);
+      this.#pausedUntil = failedAt + backoffMs(++this.#failStreak);
       return true;
     }
     this.#failStreak = 0;
