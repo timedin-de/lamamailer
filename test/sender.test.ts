@@ -135,6 +135,28 @@ test("a transient failure followed by success ends as sent", async () => {
   );
 });
 
+test("a failure pauses the whole queue so a rate limit can recover", async () => {
+  const t = setup({ maxAttempts: 10 });
+  t.mailer.failures = [
+    new Error("421 rate limit"),
+    new Error("421 rate limit"),
+  ];
+  ["id:1", "id:2", "id:3"].forEach((k) => t.add(k, `${k.slice(3)}@x.de`));
+  await t.sender.sendNext(); // id:1 fails
+  assert.equal(await t.sender.sendNext(), false); // id:2 is due but the queue is paused
+  assert.equal(t.mailer.calls, 1);
+  t.clock.now = T0 + 30_000;
+  await t.sender.sendNext(); // id:1 is due again and fails again
+  assert.equal(t.mailer.calls, 2);
+  t.clock.now = T0 + 30_000 + 59_999; // second consecutive failure doubles the pause
+  assert.equal(await t.sender.sendNext(), false);
+  t.clock.now = T0 + 30_000 + 60_000;
+  await t.sender.sendNext(); // success resets the pause
+  await t.sender.sendNext();
+  await t.sender.sendNext();
+  assert.equal(t.mailer.sent.length, 3);
+});
+
 test("per-address cap skips excess mails to one address only", async () => {
   const t = setup({ perAddressCap: 2 });
   ["id:1", "id:2", "id:3"].forEach((k) => t.add(k, "a@x.de"));

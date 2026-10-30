@@ -31,6 +31,10 @@ export function contextOf(s: Signup, siteUrl: string): MailContext {
 
 export class Sender {
   #d: Required<SenderDeps>;
+  // A failure is usually the server (rate limit, outage), not the row: pause the whole queue instead
+  // of hammering it with the next rows. In memory only; after a restart the first failure pauses again.
+  #failStreak = 0;
+  #pausedUntil = 0;
   constructor(deps: SenderDeps) {
     this.#d = { now: Date.now, ...deps };
   }
@@ -56,6 +60,7 @@ export class Sender {
     if (!s.enabled) return false;
 
     const now = this.#d.now();
+    if (now < this.#pausedUntil) return false;
     const row = store.claim(now); // the row is now "sending"
     if (!row) return false;
 
@@ -85,8 +90,10 @@ export class Sender {
       if (row.attempts >= s.maxAttempts)
         store.markFinal(row.id, "failed", message);
       else store.markRetry(row.id, now + backoffMs(row.attempts), message);
+      this.#pausedUntil = now + backoffMs(++this.#failStreak);
       return true;
     }
+    this.#failStreak = 0;
     store.markSent(row.id, this.#d.now());
     return true;
   }
