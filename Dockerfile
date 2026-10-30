@@ -1,5 +1,5 @@
 # Node >= 24 runs the .ts sources directly (type stripping), so there is no build step.
-FROM node:24-alpine
+FROM node:25-alpine
 
 WORKDIR /app
 ENV NODE_ENV=production
