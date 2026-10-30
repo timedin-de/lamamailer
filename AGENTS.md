@@ -16,6 +16,7 @@ e-mail field, SMTP, template, rules) happens in the admin UI; env vars are only 
 3. **Few, meaningful commits** (per module/feature), Conventional Commits (`feat(scope): ...`), with the harness
    `Co-Authored-By` trailer. Run `npm run typecheck && npm test` before committing.
 4. Never commit secrets or the `data/` directory.
+5. User-visible changes get an entry under `## [Unreleased]` in `CHANGELOG.md`, in the same commit.
 
 ## Commands
 
