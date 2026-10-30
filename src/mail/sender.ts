@@ -1,9 +1,9 @@
 // Works through the queue: claim a row, render the mail, send it, record the outcome.
-import type { Store, Signup } from '../core/store.ts';
-import type { Settings } from '../core/settings.ts';
-import type { Mailer } from './mailer.ts';
-import { renderMail, type MailContext } from './template.ts';
-import { sleep } from '../core/util.ts';
+import type { Store, Signup } from "../core/store.ts";
+import type { Settings } from "../core/settings.ts";
+import type { Mailer } from "./mailer.ts";
+import { renderMail, type MailContext } from "./template.ts";
+import { sleep } from "../core/util.ts";
 
 export interface SenderDeps {
   store: Store;
@@ -19,15 +19,21 @@ export function backoffMs(attempt: number): number {
 
 export function contextOf(s: Signup, siteUrl: string): MailContext {
   return {
-    name: s.name, email: s.email, siteUrl,
-    firstName: s.fields.firstName ?? '', lastName: s.fields.lastName ?? '',
-    answers: s.fields.answers ?? [], fields: s.fields.fields ?? {},
+    name: s.name,
+    email: s.email,
+    siteUrl,
+    firstName: s.fields.firstName ?? "",
+    lastName: s.fields.lastName ?? "",
+    answers: s.fields.answers ?? [],
+    fields: s.fields.fields ?? {},
   };
 }
 
 export class Sender {
   #d: Required<SenderDeps>;
-  constructor(deps: SenderDeps) { this.#d = { now: Date.now, ...deps }; }
+  constructor(deps: SenderDeps) {
+    this.#d = { now: Date.now, ...deps };
+  }
 
   /** Sends until the signal is aborted. Waits 1/ratePerSec between mails, 1s when idle. */
   async run(signal: AbortSignal): Promise<void> {
@@ -36,7 +42,7 @@ export class Sender {
       try {
         did = await this.sendNext();
       } catch (err) {
-        console.error('sender error:', err);
+        console.error("sender error:", err);
       }
       const rate = Math.max(0.1, this.#d.settings.get().ratePerSec);
       await sleep(did ? 1000 / rate : 1000, signal);
@@ -56,17 +62,28 @@ export class Sender {
     if (s.perAddressCap > 0) {
       // The claimed row itself counts as one, hence ">" and not ">=".
       if (store.sentSince(row.email, now - 3_600_000) > s.perAddressCap) {
-        store.markFinal(row.id, 'skipped', `mehr als ${s.perAddressCap} Mails/Stunde an diese Adresse`);
+        store.markFinal(
+          row.id,
+          "skipped",
+          `mehr als ${s.perAddressCap} Mails/Stunde an diese Adresse`,
+        );
         return true;
       }
     }
 
     const mail = renderMail(s.subject, s.body, contextOf(row, s.siteUrl));
     try {
-      await this.#d.getMailer().send({ to: row.email, toName: row.name, subject: mail.subject, html: mail.html, text: mail.text });
+      await this.#d.getMailer().send({
+        to: row.email,
+        toName: row.name,
+        subject: mail.subject,
+        html: mail.html,
+        text: mail.text,
+      });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      if (row.attempts >= s.maxAttempts) store.markFinal(row.id, 'failed', message);
+      if (row.attempts >= s.maxAttempts)
+        store.markFinal(row.id, "failed", message);
       else store.markRetry(row.id, now + backoffMs(row.attempts), message);
       return true;
     }

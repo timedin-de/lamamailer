@@ -14,7 +14,7 @@ export interface LamaGroup {
 /** One question as returned by GET /polls/{id}/questions (only the fields we use). */
 export interface LamaQuestion {
   id: number;
-  type: 'MATRIX' | 'CHOICE' | 'SCALE' | 'INPUT' | 'RANKING' | string;
+  type: "MATRIX" | "CHOICE" | "SCALE" | "INPUT" | "RANKING" | string;
   question?: Localized;
   groups?: LamaGroup[];
 }
@@ -34,9 +34,17 @@ export interface QuestionInfo {
   optionLabel?: string;
 }
 
-export interface Answer { label: string; value: string }
+export interface Answer {
+  label: string;
+  value: string;
+}
 
 /** A CSV row keyed by variable name (vID, vCOMPLETED, V2, ...). */
 export type CsvRow = Record<string, string>;
 
-export interface FieldChoice { varname: string; label: string; questionId: number; likelyEmail: boolean }
+export interface FieldChoice {
+  varname: string;
+  label: string;
+  questionId: number;
+  likelyEmail: boolean;
+}

@@ -158,11 +158,7 @@ export function settingsPage(v: SettingsView): string {
       lastNameOptions: fieldOptions(s.lastNameVar, true),
       choiceCount: v.choices.length,
       dateFromOptions: [
-        opt(
-          "date",
-          "Nur Datum (wie im PHP-Skript)",
-          s.dateFromFormat === "date",
-        ),
+        opt("date", "Nur Datum (Standard)", s.dateFromFormat === "date"),
         opt("datetime", "Datum und Uhrzeit", s.dateFromFormat === "datetime"),
       ],
       securityOptions: [

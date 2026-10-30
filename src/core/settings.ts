@@ -1,7 +1,7 @@
 // Every setting is edited in the admin UI and stored as one JSON document in the database.
-import type { Store } from './store.ts';
-import type { LamaQuestion } from './types.ts';
-import { DEFAULT_BODY, DEFAULT_SUBJECT } from '../mail/template.ts';
+import type { Store } from "./store.ts";
+import type { LamaQuestion } from "./types.ts";
+import { DEFAULT_BODY, DEFAULT_SUBJECT } from "../mail/template.ts";
 
 export interface SettingsData {
   // LamaPoll
@@ -13,13 +13,13 @@ export interface SettingsData {
   firstNameVar: string;
   lastNameVar: string;
   lang: string; // language used for question texts and answer labels
-  dateFromFormat: 'date' | 'datetime'; // how dateFrom is sent to the API (the PHP reference used a plain date)
+  dateFromFormat: "date" | "datetime"; // how dateFrom is sent to the API (default: a plain date)
   questions: LamaQuestion[]; // cached question definitions of the selected poll
   pollIntervalSec: number;
   // SMTP
   smtpHost: string;
   smtpPort: number;
-  smtpSecurity: 'starttls' | 'tls' | 'none';
+  smtpSecurity: "starttls" | "tls" | "none";
   smtpUser: string;
   smtpPassword: string;
   fromEmail: string;
@@ -39,23 +39,49 @@ export interface SettingsData {
 }
 
 export const DEFAULTS: SettingsData = {
-  apiKey: '', baseUrl: 'https://app.lamapoll.de/api/v2', pollId: null, pollTitle: '',
-  emailVar: '', firstNameVar: '', lastNameVar: '', lang: 'de', dateFromFormat: 'date', questions: [], pollIntervalSec: 20,
-  smtpHost: '', smtpPort: 587, smtpSecurity: 'starttls', smtpUser: '', smtpPassword: '', fromEmail: '', fromName: '', replyTo: '',
-  subject: DEFAULT_SUBJECT, body: DEFAULT_BODY, siteUrl: '',
-  ratePerSec: 5, maxAttempts: 5, perAddressCap: 5,
-  enabled: false, sendExisting: false,
+  apiKey: "",
+  baseUrl: "https://app.lamapoll.de/api/v2",
+  pollId: null,
+  pollTitle: "",
+  emailVar: "",
+  firstNameVar: "",
+  lastNameVar: "",
+  lang: "de",
+  dateFromFormat: "date",
+  questions: [],
+  pollIntervalSec: 20,
+  smtpHost: "",
+  smtpPort: 587,
+  smtpSecurity: "starttls",
+  smtpUser: "",
+  smtpPassword: "",
+  fromEmail: "",
+  fromName: "",
+  replyTo: "",
+  subject: DEFAULT_SUBJECT,
+  body: DEFAULT_BODY,
+  siteUrl: "",
+  ratePerSec: 5,
+  maxAttempts: 5,
+  perAddressCap: 5,
+  enabled: false,
+  sendExisting: false,
 };
 
-const KEY = 'settings';
+const KEY = "settings";
 
 export class Settings {
   #store: Store;
-  constructor(store: Store) { this.#store = store; }
+  constructor(store: Store) {
+    this.#store = store;
+  }
 
   get(): SettingsData {
     const raw = this.#store.getKv(KEY);
-    return { ...DEFAULTS, ...(raw ? (JSON.parse(raw) as Partial<SettingsData>) : {}) };
+    return {
+      ...DEFAULTS,
+      ...(raw ? (JSON.parse(raw) as Partial<SettingsData>) : {}),
+    };
   }
 
   update(patch: Partial<SettingsData>): SettingsData {
@@ -68,18 +94,21 @@ export class Settings {
   missing(): string[] {
     const s = this.get();
     const out: string[] = [];
-    if (!s.apiKey) out.push('LamaPoll API-Schlüssel');
-    if (!s.pollId) out.push('Umfrage');
-    if (!s.emailVar) out.push('E-Mail-Feld');
-    if (!s.smtpHost) out.push('SMTP-Server');
-    if (!s.fromEmail) out.push('Absender-Adresse');
+    if (!s.apiKey) out.push("LamaPoll API-Schlüssel");
+    if (!s.pollId) out.push("Umfrage");
+    if (!s.emailVar) out.push("E-Mail-Feld");
+    if (!s.smtpHost) out.push("SMTP-Server");
+    if (!s.fromEmail) out.push("Absender-Adresse");
     return out;
   }
 
-  isReady(): boolean { return this.missing().length === 0; }
+  isReady(): boolean {
+    return this.missing().length === 0;
+  }
 }
 
-const mask = (v: string): string => (v === '' ? '' : v.length > 4 ? `••••${v.slice(-4)}` : '••••');
+const mask = (v: string): string =>
+  v === "" ? "" : v.length > 4 ? `••••${v.slice(-4)}` : "••••";
 
 /** For display only: secrets are never sent back to the browser. */
 export function maskSecrets(s: SettingsData): SettingsData {
