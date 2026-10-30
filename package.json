@@ -1,16 +1,35 @@
 {
-  "name": "lamapoll-mailer",
+  "name": "lamamailer",
   "version": "1.0.0",
   "description": "Sends an automatic confirmation e-mail for every new LamaPoll signup. Everything is configured in the admin UI.",
+  "keywords": [
+    "lamapoll",
+    "mailer",
+    "confirmation-email",
+    "smtp"
+  ],
+  "license": "MIT",
+  "author": "TimedIn",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/timedin-de/lamamailer.git"
+  },
+  "bugs": "https://github.com/timedin-de/lamamailer/issues",
+  "homepage": "https://github.com/timedin-de/lamamailer#readme",
   "type": "module",
-  "private": true,
+  "files": [
+    "src"
+  ],
   "engines": {
     "node": ">=24"
   },
   "scripts": {
     "start": "node --disable-warning=ExperimentalWarning src/server.ts",
     "test": "node --disable-warning=ExperimentalWarning --test \"test/*.test.ts\"",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "express": "^5.2.1",
@@ -18,9 +37,13 @@
     "nodemailer": "^10.0.16"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.4",
     "@types/nodemailer": "^8.0.2",
-    "typescript": "^7.0.2"
+    "eslint": "^10.14.0",
+    "prettier": "^3.9.10",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.1"
   }
 }
