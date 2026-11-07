@@ -5,6 +5,8 @@ All notable changes to lamamailer are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-07
+
 ### Added
 
 - The signup list on the dashboard is paginated (50 per page, "« Neuere" / "Ältere »"), so every signup can be
