@@ -473,6 +473,55 @@ test("dashboard shows last poll result, counts and queue rows (escaped)", async 
   assert.match(page.html, /failed: 1/);
 });
 
+test("dashboard pages through the queue, 50 rows per page, keeping the status filter", async () => {
+  const t = await startApp();
+  configure(t);
+  t.store.addSignups(
+    Array.from({ length: 120 }, (_, i) => ({
+      key: `id:${i + 1}`,
+      email: `u${i + 1}@x.de`,
+      name: "",
+      fields: {},
+      status: i % 2 ? ("pending" as const) : ("skipped" as const),
+    })),
+    t.clock.now,
+    t.clock.now,
+  );
+  const first = (await t.browser.get("/")).html;
+  assert.match(first, /u120@x\.de/);
+  assert.match(first, /u71@x\.de/);
+  assert.doesNotMatch(first, /u70@x\.de/);
+  assert.match(first, /Seite 1 von 3/);
+  assert.match(first, /href="\/\?page(=|&#x3D;)2"/);
+
+  const last = (await t.browser.get("/?page=3")).html;
+  assert.match(last, /u20@x\.de/);
+  assert.match(last, /u1@x\.de/);
+  assert.doesNotMatch(last, /u21@x\.de/);
+  assert.match(last, /href="\/\?page(=|&#x3D;)2"/);
+
+  // out-of-range or garbage page numbers land on a valid page
+  assert.match((await t.browser.get("/?page=99")).html, /Seite 3 von 3/);
+  assert.match((await t.browser.get("/?page=abc")).html, /Seite 1 von 3/);
+
+  const filtered = (await t.browser.get("/?status=pending&page=2")).html;
+  assert.match(filtered, /Seite 2 von 2/);
+  assert.match(filtered, /href="\/\?status(=|&#x3D;)pending&amp;page(=|&#x3D;)1"/);
+  assert.match(filtered, /u2@x\.de/);
+  assert.doesNotMatch(filtered, /u3@x\.de/); // odd ids are skipped
+});
+
+test("one page of rows shows no pager", async () => {
+  const t = await startApp();
+  configure(t);
+  t.store.addSignups(
+    [{ key: "id:1", email: "a@x.de", name: "", fields: {}, status: "pending" }],
+    t.clock.now,
+    t.clock.now,
+  );
+  assert.doesNotMatch((await t.browser.get("/")).html, /Seite \d+ von/);
+});
+
 test('stuck "sending" rows are flagged and can be confirmed or retried; sent rows cannot be requeued', async () => {
   const t = await startApp();
   configure(t);

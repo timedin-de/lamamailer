@@ -55,3 +55,11 @@
   <tr><td colspan="8">Keine Einträge.</td></tr>
   {{/each}}
 </table>
+
+{{#with pager}}
+<p class="pager">
+  {{#if prev}}<a href="{{prev}}">« Neuere</a>{{else}}<span class="muted">« Neuere</span>{{/if}}
+  &nbsp; Seite {{page}} von {{pages}} &nbsp;
+  {{#if next}}<a href="{{next}}">Ältere »</a>{{else}}<span class="muted">Ältere »</span>{{/if}}
+</p>
+{{/with}}

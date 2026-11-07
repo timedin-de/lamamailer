@@ -75,8 +75,18 @@ export interface DashboardView {
   counts: Record<string, number>;
   rows: (Signup & { stale: boolean })[];
   filter: string;
+  page: number; // 1-based, already clamped to 1..pages
+  pages: number;
   staleCount: number;
   error?: string;
+}
+
+/** Dashboard URL for one page, keeping the status filter. */
+function pageUrl(filter: string, page: number): string {
+  const q = new URLSearchParams();
+  if (filter) q.set("status", filter);
+  q.set("page", String(page));
+  return `/?${q}`;
 }
 
 const fmt = (ms: number) => (ms ? new Date(ms).toLocaleString("de-DE") : "–");
@@ -95,6 +105,12 @@ export function dashboardPage(v: DashboardView): string {
         added: v.lastPoll.added ?? 0,
       },
       counts: Object.entries(v.counts).map(([status, n]) => ({ status, n })),
+      pager: v.pages > 1 && {
+        page: v.page,
+        pages: v.pages,
+        prev: v.page > 1 && pageUrl(v.filter, v.page - 1),
+        next: v.page < v.pages && pageUrl(v.filter, v.page + 1),
+      },
       rows: v.rows.map((r) => ({
         ...r,
         createdAt: fmt(r.createdAt),

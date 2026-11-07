@@ -36,6 +36,7 @@ export interface AppDeps {
 const SESSION_MS = 12 * 3600_000;
 const COOKIE = "sid";
 const ADMIN_KEY = "admin_hash";
+const PAGE_SIZE = 50; // queue rows per dashboard page
 
 const errorMessage = (e: unknown): string =>
   e instanceof Error ? e.message : String(e);
@@ -192,6 +193,7 @@ export function createApp(deps: AppDeps) {
     status: number,
     filter: string,
     error?: string,
+    requestedPage = 1,
   ) {
     const s = settings.get();
     const missing = settings.missing();
@@ -202,8 +204,14 @@ export function createApp(deps: AppDeps) {
         : store.getKv("activated") === "1"
           ? "paused"
           : "ready";
+    const counts = store.counts();
+    const total = filter
+      ? (counts[filter] ?? 0)
+      : Object.values(counts).reduce((a, b) => a + b, 0);
+    const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    const page = Math.min(Math.max(1, requestedPage), pages);
     const rows = store
-      .list(filter, 200)
+      .list(filter, PAGE_SIZE, (page - 1) * PAGE_SIZE)
       .map((r) => ({ ...r, stale: store.isStale(r, now()) }));
     const lastRaw = store.getKv("last_poll");
     html(
@@ -214,17 +222,25 @@ export function createApp(deps: AppDeps) {
         missing,
         pollTitle: s.pollTitle || `#${s.pollId}`,
         lastPoll: lastRaw ? JSON.parse(lastRaw) : null,
-        counts: store.counts(),
+        counts,
         rows,
         filter,
-        staleCount: rows.filter((r) => r.stale).length,
+        page,
+        pages,
+        staleCount: store.countStale(now()),
         error,
       }),
     );
   }
 
   app.get("/", (req, res) =>
-    renderDashboard(res, 200, String(req.query.status ?? "")),
+    renderDashboard(
+      res,
+      200,
+      String(req.query.status ?? ""),
+      undefined,
+      int(String(req.query.page ?? "1"), 1, Number.MAX_SAFE_INTEGER) ?? 1,
+    ),
   );
 
   app.post("/activate", (req, res) => {

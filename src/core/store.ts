@@ -248,20 +248,32 @@ export class Store {
     return Object.fromEntries(rows.map((r) => [String(r.status), Number(r.n)]));
   }
 
-  /** Newest rows first, optionally filtered by status ('' = all). */
-  list(status: string, limit: number): Signup[] {
+  /** Newest rows first, optionally filtered by status ('' = all); skips the first `offset` rows. */
+  list(status: string, limit: number, offset = 0): Signup[] {
     const rows = (
       status
         ? this.#db
             .prepare(
-              `SELECT ${COLS} FROM signups WHERE status = ? ORDER BY id DESC LIMIT ?`,
+              `SELECT ${COLS} FROM signups WHERE status = ? ORDER BY id DESC LIMIT ? OFFSET ?`,
             )
-            .all(status, limit)
+            .all(status, limit, offset)
         : this.#db
-            .prepare(`SELECT ${COLS} FROM signups ORDER BY id DESC LIMIT ?`)
-            .all(limit)
+            .prepare(
+              `SELECT ${COLS} FROM signups ORDER BY id DESC LIMIT ? OFFSET ?`,
+            )
+            .all(limit, offset)
     ) as Row[];
     return rows.map(toSignup);
+  }
+
+  /** Rows stuck in 'sending' (see isStale), over the whole queue. */
+  countStale(nowMs: number): number {
+    const r = this.#db
+      .prepare(
+        "SELECT COUNT(*) AS n FROM signups WHERE status = 'sending' AND ? - sending_since > ?",
+      )
+      .get(nowMs, STALE_SENDING_MS) as Row;
+    return Number(r.n);
   }
 
   /** For a poll switch: deletes every signup and the per-poll state, so the new poll starts from scratch. */
