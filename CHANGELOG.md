@@ -5,6 +5,14 @@ All notable changes to lamamailer are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-07
+
+### Added
+
+- The signup list on the dashboard is paginated (50 per page, "« Neuere" / "Ältere »"), so every signup can be
+  reached instead of only the newest 200. The status filter is kept while paging, and the warning about rows stuck in
+  "sending" now counts the whole queue, not just the rows shown.
+
 ### Fixed
 
 - A failed mail (e.g. an SMTP rate limit) now pauses the whole queue instead of moving on to the next signup, so the

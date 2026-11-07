@@ -16,7 +16,10 @@ e-mail field, SMTP, template, rules) happens in the admin UI; env vars are only 
 3. **Few, meaningful commits** (per module/feature), Conventional Commits (`feat(scope): ...`), with the harness
    `Co-Authored-By` trailer. Run `npm run typecheck && npm test` before committing.
 4. Never commit secrets or the `data/` directory.
-5. User-visible changes get an entry under `## [Unreleased]` in `CHANGELOG.md`, in the same commit.
+5. User-visible changes get a `CHANGELOG.md` entry and a version bump, in the same commit. Bump with
+   `npm version <patch|minor|major> --no-git-tag-version` (SemVer: fix = patch, new feature = minor, breaking =
+   major), then move the entries from `## [Unreleased]` into a new `## [x.y.z] - YYYY-MM-DD` section and leave
+   `## [Unreleased]` empty above it.
 
 ## Commands
 

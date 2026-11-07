@@ -205,6 +205,23 @@ test("counts and status filter", () => {
   assert.equal(store.list("skipped", 10)[0].key, "id:2");
 });
 
+test("list pages with an offset; countStale counts stuck rows across all pages", () => {
+  const { store } = open();
+  seed(store, "a@x.de", "b@x.de", "c@x.de", "d@x.de", "e@x.de");
+  assert.deepEqual(
+    store.list("", 2, 2).map((r) => r.key),
+    ["id:3", "id:2"],
+  );
+  assert.deepEqual(
+    store.list("pending", 2, 4).map((r) => r.key),
+    ["id:1"],
+  );
+  store.claim(T0);
+  store.claim(T0);
+  assert.equal(store.countStale(T0 + 1000), 0);
+  assert.equal(store.countStale(T0 + 3_600_000), 2);
+});
+
 test("sessions are valid until they expire and can be deleted", () => {
   const { store } = open();
   store.createSession("tok", T0 + 1000);
